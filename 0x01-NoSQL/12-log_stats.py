@@ -3,26 +3,21 @@
 from pymongo import MongoClient
 
 
-def print_nginx_request_logs(nginx_collection):
-    """ prints nginx req logs stats in mongo """
-    print('{} logs'.format(nginx_collection.count_documents({})))
-    print('Methods:')
-    methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
-
-    for method in methods:
-        req_count = len(list(nginx_collection.find({'method': method})))
-        print('\tmethod {}: {}'.format(method, req_count))
-    status_checks_count = len(list(
-        nginx_collection.find({'method': 'GET', 'path': '/status'})
-    ))
-    print('{} status check'.format(status_checks_count))
-
-
-def main():
-    """ Run mongo and get stats """
+if __name__ == "__main__":
     client = MongoClient('mongodb://127.0.0.1:27017')
-    print_nginx_request_logs(client.logs.nginx)
+    nginx_collection = client.logs.nginx
 
+    # Number of documents in this collection
+    num_logs = nginx_collection.count_documents({})
+    print(f"{num_logs} logs")
 
-if __name__ == '__main__':
-    main()
+    # Number of documents with each method
+    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
+    print("Methods:")
+    for method in methods:
+        num_method = nginx_collection.count_documents({"method": method})
+        print(f"\tmethod {method}: {num_method}")
+
+    # Number of documents with method=GET and path=/status
+    num_status_check = nginx_collection.count_documents({"method": "GET", "path": "/status"})
+    print(f"{num_status_check} status check")
