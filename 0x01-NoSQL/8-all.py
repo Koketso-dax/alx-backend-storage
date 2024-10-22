@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-""" MongoDB Operations with Python using pymongo """
+"""
+Uses python function to list all docs
+"""
 
 
-def schools_by_topic(mongo_collection, topic):
-    """ returns the list of school having a specific topic """
-    documents = mongo_collection.find({"topics": topic})
-    return list(documents)
+def list_all(mongo_collection):
+    """
+    Lists all docs in collection.
+    """
+    return [doc for doc in mongo_collection.find()]
