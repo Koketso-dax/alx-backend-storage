@@ -19,11 +19,10 @@ def track_get_page(fn: Callable) -> Callable:
         """
         client = redis.Redis()
         client.incr(f'count:{url}')
-        cached_page = client.get(f'{url}')
-        if cached_page:
-            return cached_page.decode('utf-8')
+        if client.exists(url):
+            return client.get(url).decode('utf-8')
         response = fn(url)
-        client.set(f'{url}', response, 10)
+        client.set(url, response, 10)
         return response
     return wrapper
 
