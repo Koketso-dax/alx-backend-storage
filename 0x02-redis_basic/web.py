@@ -23,7 +23,7 @@ def track_get_page(fn: Callable) -> Callable:
         if cached_page:
             return cached_page.decode('utf-8')
         response = fn(url)
-        client.set(f'{url}', response, 10)
+        client.set(f'{url}', response.decode('utf-8'), 10)
         return response
     return wrapper
 
