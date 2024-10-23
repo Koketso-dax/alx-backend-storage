@@ -17,7 +17,7 @@ def track_get_page(fn: Callable) -> Callable:
             - check whether a url's data is cached
             - tracks how many times get_page is called
         """
-        client = redis.Redis(socket_connect_timeout=10)
+        client = redis.Redis()
         client.incr(f'count: {url}')
         if client.exists(url):
             return client.get(url).decode('utf-8')
