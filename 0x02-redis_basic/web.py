@@ -35,4 +35,6 @@ def track_get_page(fn: Callable) -> Callable:
 def get_page(url: str) -> str:
     """ Makes a http request to a given endpoint
     """
-    return requests.get(url).text
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.text
