@@ -22,7 +22,7 @@ def track_get_page(fn: Callable) -> Callable:
         if client.exists(url):
             return client.get(url).decode('utf-8')
         response = fn(url)
-        client.set(url, response.encode('utf-8'), 10)
+        client.set(url, response, 10)
         return response
     return wrapper
 
