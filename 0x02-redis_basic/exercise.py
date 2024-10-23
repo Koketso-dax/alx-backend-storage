@@ -22,10 +22,26 @@ def callhistory(method: Callable) -> Callable:
     """ Decorator to store method call history """
     @wraps(method)
     def wrapper(self, *args, **kwargs):
-        """ Wrapper function to store method call history """
-        self._redis.rpush(method.__qualname__ + ":calls", str(args))
-        return method(self, *args, **kwargs)
+        input_key = method.__qualname__ + ":inputs"
+        output_key = method.__qualname__ + ":outputs"
+        self._redis.rpush(input_key, str(args))
+        output = method(self, *args, **kwargs)
+        self._redis.rpush(output_key, str(output))
+        return output
     return wrapper
+
+
+def replay(method):
+    """ Display the history of calls of a particular function. """
+    input_key = method.__qualname__ + ":inputs"
+    output_key = method.__qualname__ + ":outputs"
+    num_calls = int(method.__self__._redis.get(method.__qualname__))
+    print(f"{method.__qualname__} was called {num_calls} times:")
+    inputs = method.__self__._redis.lrange(input_key, 0, -1)
+    outputs = method.__self__._redis.lrange(output_key, 0, -1)
+    for input_args, output in zip(inputs, outputs):
+        print(f"{method.__qualname__}(*{input_args.decode('utf-8')
+                                        }) -> {output.decode('utf-8')}")
 
 
 class Cache:
