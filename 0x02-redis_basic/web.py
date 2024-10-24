@@ -8,9 +8,6 @@ from functools import wraps
 from typing import Callable
 
 
-client = redis.Redis()
-
-
 def track_get_page(fn: Callable) -> Callable:
     """ Decorator for get_page
     """
@@ -20,6 +17,7 @@ def track_get_page(fn: Callable) -> Callable:
             - check whether a url's data is cached
             - tracks how many times get_page is called
         """
+        client = redis.Redis()
         count_key = f'count:{url}'
         page_key = url
         client.incr(count_key)
