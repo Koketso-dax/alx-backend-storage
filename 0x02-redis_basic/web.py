@@ -2,6 +2,7 @@
 """
 Caching request module
 """
+from datetime import timedelta
 import redis
 import requests
 from functools import wraps
@@ -15,17 +16,18 @@ def track_get_page(fn: Callable) -> Callable:
     def wrapper(url: str) -> str:
         """ Wrapper that:
             - check whether a url's data is cached
-            - tracks how many times get_page is called
+            - tracks how many times get_page was called
         """
         client = redis.Redis()
-        count_key = f'count:{url}'
+        expiry = timedelta(seconds=10)
+        count_key = f'count: {url}'
         page_key = url
         client.incr(count_key)
         cached_page = client.get(page_key)
         if cached_page:
             return cached_page.decode('utf-8')
         response = fn(url)
-        client.setex(page_key, 10, response)
+        client.setex(page_key, expiry, response)
         return response
     return wrapper
 
