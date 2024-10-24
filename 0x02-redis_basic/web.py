@@ -20,14 +20,14 @@ def track_get_page(fn: Callable) -> Callable:
         """
         client = redis.Redis()
         expiry = timedelta(seconds=10)
-        count_key = f'count: {url}'
+        count_key = f"count: {url}"
         page_key = url
         client.incr(count_key)
         cached_page = client.get(page_key)
         if cached_page:
             return cached_page.decode('utf-8')
         response = fn(url)
-        client.setex(page_key, expiry, response)
+        client.set(page_key, response, ex=expiry)
         return response
     return wrapper
 
