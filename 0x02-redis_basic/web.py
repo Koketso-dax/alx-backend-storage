@@ -20,12 +20,14 @@ def track_get_page(fn: Callable) -> Callable:
             - check whether a url's data is cached
             - tracks how many times get_page is called
         """
-        client.incr(f'count:{url}')
-        cached_page = client.get(f'{url}')
+        count_key = f'count:{url}'
+        page_key = url
+        client.incr(count_key)
+        cached_page = client.get(page_key)
         if cached_page:
             return cached_page.decode('utf-8')
         response = fn(url)
-        client.setex(f'{url}', 10, response)
+        client.setex(page_key, 10, response)
         return response
     return wrapper
 
