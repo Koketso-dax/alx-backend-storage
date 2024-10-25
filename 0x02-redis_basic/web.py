@@ -23,7 +23,7 @@ def track_get_page(fn: Callable) -> Callable:
         """
         expiry = timedelta(seconds=10)
         count_key = f"count:{url}"
-        page_key = url
+        page_key = f"{url}"
         client.incr(count_key)
         cached_page = client.get(page_key)
         if cached_page:
