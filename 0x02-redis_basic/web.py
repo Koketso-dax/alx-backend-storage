@@ -27,7 +27,7 @@ def track_get_page(fn: Callable) -> Callable:
         client.incr(count_key)
         cached_page = client.get(page_key)
         if cached_page:
-            return cached_page.decode('utf-8')
+            return cached_page
         response = fn(url)
         client.setex(page_key, expiry, response)
         return response
