@@ -9,7 +9,7 @@ from functools import wraps
 from typing import Callable
 
 
-client = redis.Redis()
+redis_client = redis.Redis()
 
 
 def track_get_page(fn: Callable) -> Callable:
@@ -21,16 +21,26 @@ def track_get_page(fn: Callable) -> Callable:
             - check whether a url's data is cached
             - tracks how many times get_page was called
         """
-        expiry = timedelta(seconds=10)
-        count_key = f"count:{url}"
-        page_key = f"{url}"
-        client.incr(count_key)
-        cached_page = client.get(page_key)
+        # Check if the page is cached
+        cached_page = redis_client.get(f'page:{url}')
         if cached_page:
-            return cached_page
-        response = fn(url)
-        client.setex(page_key, expiry, response)
-        return response
+            # Increment the counter
+            redis_client.incr(f'count:{url}')
+            return cached_page.decode('utf-8')
+
+        # Get the page content
+        page_content = fn(url)
+
+        # Cache the page content for 10 seconds
+        redis_client.set(f'page:{url}', page_content, ex=10)
+
+        # Initialize the counter if it doesn't exist
+        if not redis_client.exists(f'count:{url}'):
+            redis_client.set(f'count:{url}', 0)
+
+        # Increment the counter
+        redis_client.incr(f'count:{url}')
+        return page_content
     return wrapper
 
 
