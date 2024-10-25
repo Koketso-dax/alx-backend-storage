@@ -4,7 +4,6 @@ Caching request module
 """
 from datetime import timedelta
 import redis
-from redis.typing import KeyT, ValueT
 import requests
 from functools import wraps
 from typing import Callable
@@ -23,8 +22,8 @@ def track_get_page(fn: Callable) -> Callable:
             - tracks how many times get_page was called
         """
         expiry = timedelta(seconds=10)
-        count_key: KeyT = f"count:{url}"
-        page_key: KeyT = f"{url}"
+        count_key = f"count:{url}"
+        page_key = f"{url}"
         client.incr(count_key)
         cached_page = client.get(page_key)
         if cached_page:
@@ -40,5 +39,4 @@ def get_page(url: str) -> str:
     """ Makes a http request to a given endpoint
     """
     response = requests.get(url)
-    response.raise_for_status()
-    return response
+    return response.status_code
