@@ -2,7 +2,6 @@
 """
 Caching request module
 """
-from datetime import timedelta
 import redis
 import requests
 from functools import wraps
@@ -28,7 +27,7 @@ def track_get_page(fn: Callable) -> Callable:
             redis_client.incr(f'count:{url}')
             return cached_page.decode('utf-8')
 
-         # Get the page content
+        # Get the page content
         try:
             page_content = fn(url)
         except requests.RequestException as e:
