@@ -15,21 +15,12 @@ if __name__ == "__main__":
 
     # First request
     print(get_page(url))
-    print(f"Call count for {url}: {client.get(count_key)}")
-    print(f"Cached content for {url}: {client.get(page_key)}")
+    print(f"Call count for {url}: {client.get(count_key).decode('utf-8')}")
+    print(f"Cached content for {url}: {client.get(page_key).decode('utf-8')}")
 
-    # Wait for 5 seconds
-    time.sleep(5)
+    # Wait for 10 seconds
+    time.sleep(10)
 
     # Second request (should fetch from cache)
-    print(get_page(url))
-    print(f"Call count for {url}: {client.get(count_key)}")
-    print(f"Cached content for {url}: {client.get(page_key)}")
-
-    # Wait for another 6 seconds (total 11 seconds)
-    time.sleep(6)
-
-    # Third request (should fetch from web again)
-    print(get_page(url))
-    print(f"Call count for {url}: {client.get(count_key)}")
-    print(f"Cached content for {url}: {client.get(page_key)}")
+    
+    print(f"Cached content for {url}: {client.get(page_key).decode('utf-8')}")

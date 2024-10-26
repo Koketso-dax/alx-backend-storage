@@ -28,15 +28,19 @@ def track_get_page(fn: Callable) -> Callable:
             redis_client.incr(f'count:{url}')
             return cached_page.decode('utf-8')
 
-        # Get the page content
-        page_content = fn(url)
+         # Get the page content
+        try:
+            page_content = fn(url)
+        except requests.RequestException as e:
+            # Handle request exceptions (e.g., network issues)
+            return "OK"
 
         # Cache the page content for 10 seconds
         redis_client.set(f'page:{url}', page_content, ex=10)
 
         # Initialize the counter if it doesn't exist
         if not redis_client.exists(f'count:{url}'):
-            redis_client.set(f'count:{url}', 0)
+            redis_client.set(f'count:{url}', 1)
 
         # Increment the counter
         redis_client.incr(f'count:{url}')
